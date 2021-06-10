@@ -1,0 +1,28 @@
+name: gxggxl-sync
+on:
+  schedule:
+    - cron: '1 */3 * * *'
+  workflow_dispatch:
+  watch:
+    types: started
+  repository_dispatch:
+    types: sync-gxggxl-Scripts
+jobs:
+  repo-sync:
+    env:
+      PAT: ${{ secrets.PAT }} 
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: sync gxggxl-Scripts
+        uses: repo-sync/github-sync@v2
+        if: env.PAT
+        with:
+          source_repo: "https://github.com/gxggxl/Scripts.git"
+          source_branch: "master"
+          destination_branch: "gxggxl"
+          github_token: ${{ secrets.PAT }}
